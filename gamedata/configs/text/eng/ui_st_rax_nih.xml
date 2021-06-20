@@ -1,0 +1,46 @@
+<!-- 
+	Anomaly Modconfiguration Menu strings
+	
+-->
+
+<string_table>
+
+
+	<string id="ui_mcm_title_new_item_highlight">
+		<text>New Item Highlight</text>
+	</string>
+
+	<string id="ui_mcm_menu_new_item_highlight">
+		<text>New Item Highlight</text>
+	</string>
+	<string id="ui_mcm_new_item_highlight_clear_type">
+		<text>Highlight Clear Method</text>
+	</string>
+	<string id="ui_mcm_new_item_highlight_highlight_clear_type_desc">
+		<text>Focus with key requires left shift to be held down before mouseing over item.</text>
+	</string>
+	<string id="ui_mcm_new_item_highlight_highlight_clr_a">
+		<text>Highlight Alpha</text>
+	</string>
+	<string id="ui_mcm_new_item_highlight_highlight_clr_r">
+		<text>Highlight Red</text>
+	</string>
+	<string id="ui_mcm_new_item_highlight_highlight_clr_g">
+		<text>Highlight Green</text>
+	</string>
+	<string id="ui_mcm_new_item_highlight_highlight_clr_b">
+		<text>Highlight Blue</text>
+	</string>
+
+	<string id="ui_mcm_lst_rax_nih_focus">
+		<text>Clear on Focus</text>
+	</string>
+	<string id="ui_mcm_lst_rax_nih_key_focus">
+		<text>Clear on Focus with key</text>
+	</string>
+	<string id="ui_mcm_lst_rax_nih_inv_close">
+		<text>Clear on Inventory Close.</text>
+	</string>
+
+
+</string_table>

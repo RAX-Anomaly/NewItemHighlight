@@ -1,0 +1,173 @@
+--[[
+New Item Highlight
+20FEB2021
+This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+Author: RavenAscendant
+--]]
+
+
+
+
+ ENABLED=false --starts false do not change.
+local NOTICE = false
+local HIGHLIGHT = true
+local new_itms ={}
+local clear_states = {
+	focus = 1,
+	key_focus = 2,
+	inv_closed = 3,
+	}
+
+local UPDATE_STATE= 0
+local CLEAR_STATE = clear_states.focus
+local KEY_TO_CLEAR_PRESSED = false
+local clear_key = DIK_keys.DIK_LSHIFT
+local bags = {actor_bag = true,actor_trade_bag = true, actor_equ = true,}
+
+function pr(txt, ...)
+   -- printf("RAXNH: "..txt, ...)
+end
+
+highlight_color = GetARGB(50, 212, 175,  55)
+
+
+local function set_enabled(state)
+	ENABLED = state 
+	return true
+end
+function on_key_press(key)
+	if UPDATE_STATE == 1 then
+		UPDATE_STATE = 2
+		ENABLED = true
+	end
+	
+	if (key == clear_key) then
+		KEY_TO_CLEAR_PRESSED = true
+		--printf( "shift pressed" )
+	end
+end
+
+function on_key_release(key)
+	if (key == clear_key) then
+		KEY_TO_CLEAR_PRESSED = false
+		--printf( "shift pressed" )
+	end
+end
+
+
+function GUI_on_show(name)
+	if  (name ~= "UIInventory")  then return end --return quickly if not the GUI we want
+	ENABLED=false
+ 
+end
+
+
+function check_new_item(cell)
+	if bags[cell.container.ID] then
+		return new_itms[cell.ID] and highlight_color
+	end
+end
+
+
+function GUI_on_hide(name)
+	if  (name ~= "UIInventory")  then return end --return quickly if not the GUI we want
+	ENABLED=true
+	
+	if CLEAR_STATE == clear_states.inv_closed then
+		new_itms ={}
+	end
+end
+
+function temp_disable()
+	CreateTimeEvent("RAXIH", "disable", 0.1, set_enabled, ENABLED)
+	ENABLED = false
+end
+
+function actor_on_first_update()
+	UPDATE_STATE=1
+end
+
+function actor_on_item_take(itm)
+	local sec = itm and itm:section()
+	local id = itm and itm:id() or itm.id
+	
+	if not sec or not ENABLED then return end
+	local item_name = game.translate_string(ini_sys:r_string_ex(sec, "inv_name_short"))
+	if NOTICE then
+		local header = game.translate_string("st_tip")
+		
+		local message = db.actor:character_name() .." ".. game.translate_string("picked_up").." " .. item_name.."."
+	
+		db.actor:give_game_news(header, message, "ui_inGame2_Polucheni_koordinaty_taynika", 0, 5000, 0)
+	end
+	
+	if HIGHLIGHT then
+		new_itms[id] = item_name
+		pr("WTF:"..tostring(new_itms[id])..tostring(id))
+	end
+	
+end
+
+local function save_state(mdata) 
+	mdata.rax_new_itms = new_itms
+end
+
+local function load_state(mdata) 
+	new_itms = mdata.rax_new_itms or new_itms
+end
+
+function ActorMenu_on_item_focus_receive(obj)
+	pr("focus")
+	if (CLEAR_STATE == clear_states.focus or CLEAR_STATE == clear_states.key_focus and KEY_TO_CLEAR_PRESSED ) and obj and obj:id() then
+		new_itms[obj:id()] = nil  
+	end
+end
+
+
+
+
+function on_mcm_load() --builds mcm menu
+		t = {
+				{ id= "new_item_highlight"				 ,type= "slide"	  ,link= "ui_options_slider_economy_diff"	 ,text= "ui_mcm_title_new_item_highlight"		,size= {512,50}		,spacing= 20 },
+				{id = "clear_type", type = "list", val = 0, def = "focus", content = {{"focus","rax_nih_focus"} , {"key_focus","rax_nih_key_focus"} , {"inv_closed","rax_nih_inv_close"} }},
+				{ id= "highlight_clr_a"       	 ,type= "track"    ,val= 2	,min= 0   ,max= 255    ,step= 1		,def= 50   },
+				{ id= "highlight_clr_r"       	 ,type= "track"    ,val= 2	,min= 0   ,max= 255    ,step= 1		,def= 212   },
+				{ id= "highlight_clr_g"       	 ,type= "track"    ,val= 2	,min= 0   ,max= 255    ,step= 1		,def= 175   },
+				{ id= "highlight_clr_b"       	 ,type= "track"    ,val= 2	,min= 0   ,max= 255    ,step= 1		,def= 55   },
+			}
+	
+
+			
+		
+	op = { id= "new_item_highlight"      	 	,sh=true ,gr= t	} -- put the list of setting into the table describing the entire MCM menu
+			
+		return op
+end
+
+function loadsetting()
+	CLEAR_STATE = clear_states[ui_mcm.get("new_item_highlight/clear_type")]
+	local a = ui_mcm.get("new_item_highlight/highlight_clr_a")
+	local b = ui_mcm.get("new_item_highlight/highlight_clr_b")
+	local r = ui_mcm.get("new_item_highlight/highlight_clr_r")
+	local g = ui_mcm.get("new_item_highlight/highlight_clr_g")
+	highlight_color = GetARGB(a, r, g,  b)
+end
+
+
+
+
+function on_game_start()
+	rax_persistent_highlight.register("new_item", check_new_item)
+	ENABLED=false
+	RegisterScriptCallback("ActorMenu_on_item_focus_receive",ActorMenu_on_item_focus_receive)
+	RegisterScriptCallback("actor_on_item_take",actor_on_item_take)
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	RegisterScriptCallback("GUI_on_show", GUI_on_show)
+	RegisterScriptCallback("GUI_on_hide", GUI_on_hide)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("load_state",load_state)
+	RegisterScriptCallback("on_key_release",on_key_release)
+	RegisterScriptCallback("on_key_press",on_key_press)
+	RegisterScriptCallback("on_option_change", loadsetting)
+	loadsetting()
+end
