@@ -16,7 +16,7 @@
 	<string id="ui_mcm_new_item_highlight_clear_type">
 		<text>Highlight Clear Method</text>
 	</string>
-	<string id="ui_mcm_new_item_highlight_highlight_clear_type_desc">
+	<string id="ui_mcm_new_item_highlight_clear_type_desc">
 		<text>Focus with key requires left shift to be held down before mouseing over item.</text>
 	</string>
 	<string id="ui_mcm_new_item_highlight_highlight_clr_a">
