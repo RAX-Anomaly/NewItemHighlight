@@ -169,5 +169,7 @@ function on_game_start()
 	RegisterScriptCallback("on_key_release",on_key_release)
 	RegisterScriptCallback("on_key_press",on_key_press)
 	RegisterScriptCallback("on_option_change", loadsetting)
-	loadsetting()
+	if ui_mcm then
+		loadsetting()
+	end
 end
