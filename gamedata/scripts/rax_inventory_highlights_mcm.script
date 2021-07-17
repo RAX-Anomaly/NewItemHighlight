@@ -145,6 +145,7 @@ function on_mcm_load() --builds mcm menu
 end
 
 function loadsetting()
+	if not ui_mcm then return end
 	CLEAR_STATE = clear_states[ui_mcm.get("new_item_highlight/clear_type")]
 	local a = ui_mcm.get("new_item_highlight/highlight_clr_a")
 	local b = ui_mcm.get("new_item_highlight/highlight_clr_b")
@@ -169,7 +170,6 @@ function on_game_start()
 	RegisterScriptCallback("on_key_release",on_key_release)
 	RegisterScriptCallback("on_key_press",on_key_press)
 	RegisterScriptCallback("on_option_change", loadsetting)
-	if ui_mcm then
-		loadsetting()
-	end
+	loadsetting()
+	
 end
